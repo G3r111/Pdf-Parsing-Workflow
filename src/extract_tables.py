@@ -9,7 +9,7 @@ def camelot_table_extractor(pdf_path):
 
     output_path = os.path.join(output_folder, f"{filename}_camelot_tables.csv")
 
-    print(f"\n📊 Extracting tables using Camelot from: {pdf_path}")
+    print(f"\nExtracting tables using Camelot from: {pdf_path}")
 
     try:
         # Extract tables using both stream and lattice modes
@@ -29,7 +29,7 @@ def camelot_table_extractor(pdf_path):
             combined_df = pd.concat([combined_df, df], ignore_index=True)
 
         combined_df.to_csv(output_path, index=False)
-        print(f"✅ Saved merged tables → {output_path}")
+        print(f"Saved merged tables → {output_path}")
 
     except Exception as e:
-        print(f"❌ Error while extracting tables: {e}")
+        print(f"Error while extracting tables: {e}")

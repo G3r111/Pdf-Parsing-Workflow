@@ -6,7 +6,7 @@ INPUT_FOLDER = "./data/input_pdfs"
 
 def list_pdfs():
     files = [f for f in os.listdir(INPUT_FOLDER) if f.endswith(".pdf")]
-    print("\n📁 Available PDFs:")
+    print("\nAvailable PDFs:")
     for i, f in enumerate(files, start=1):
         print(f"{i}. {f}")
     return files
@@ -28,10 +28,10 @@ def main():
             extract_text_from_pdf(pdf_path)
             extract_tables_from_pdf(pdf_path)
         else:
-            print("❌ Invalid mode selected.")
+            print("Invalid mode selected.")
 
     except (IndexError, ValueError):
-        print("❌ Invalid selection. Please try again.")
+        print("Invalid selection. Please try again.")
 
 if __name__ == "__main__":
     main()
