@@ -1,52 +1,37 @@
 import os
-import json
-import pandas as pd
+from extract_text import extract_text_from_pdf
+from extract_tables import camelot_table_extractor as extract_tables_from_pdf
 
-GROUND_TRUTH_PATH = "./data/ground_truth/ground_truth.csv"
-OUTPUT_FOLDER = "./data/outputs"
+INPUT_FOLDER = "./data/input_pdfs"
 
-def load_ground_truth():
-    return pd.read_csv(GROUND_TRUTH_PATH)
+def list_pdfs():
+    files = [f for f in os.listdir(INPUT_FOLDER) if f.endswith(".pdf")]
+    print("\n📁 Available PDFs:")
+    for i, f in enumerate(files, start=1):
+        print(f"{i}. {f}")
+    return files
 
-def load_parser_output(filename):
-    json_path = os.path.join(OUTPUT_FOLDER, filename.replace(".pdf", ".json"))
-    if os.path.exists(json_path):
-        with open(json_path) as f:
-            return json.load(f)
-    return None
+def main():
+    files = list_pdfs()
+    choice = input("\nEnter the number of the file to process: ")
+    try:
+        index = int(choice) - 1
+        filename = files[index]
+        pdf_path = os.path.join(INPUT_FOLDER, filename)
 
-def compare_fields(truth_row, parsed_data):
-    mismatches = {}
-    for field in ["total", "date"]:
-        truth_value = str(truth_row[field])
-        parsed_value = str(parsed_data.get(field, ""))
-        if truth_value != parsed_value:
-            mismatches[field] = {"truth": truth_value, "parsed": parsed_value}
-    return mismatches
-
-def run_accuracy_check():
-    truth_df = load_ground_truth()
-    total_files = len(truth_df)
-    correct = 0
-    mismatch_log = []
-
-    for _, row in truth_df.iterrows():
-        filename = row["filename"]
-        parsed = load_parser_output(filename)
-        if parsed:
-            mismatches = compare_fields(row, parsed)
-            if not mismatches:
-                correct += 1
-            else:
-                mismatch_log.append({"filename": filename, "errors": mismatches})
+        mode = input("Run (T)ext extraction, (C)SV table extraction, or (B)oth? ").lower()
+        if mode == "t":
+            extract_text_from_pdf(pdf_path)
+        elif mode == "c":
+            extract_tables_from_pdf(pdf_path)
+        elif mode == "b":
+            extract_text_from_pdf(pdf_path)
+            extract_tables_from_pdf(pdf_path)
         else:
-            mismatch_log.append({"filename": filename, "errors": "No parser output found"})
+            print("❌ Invalid mode selected.")
 
-    accuracy = correct / total_files * 100
-    print(f"Accuracy: {accuracy:.2f}%")
-    print("Mismatches:")
-    for entry in mismatch_log:
-        print(entry)
+    except (IndexError, ValueError):
+        print("❌ Invalid selection. Please try again.")
 
 if __name__ == "__main__":
-    run_accuracy_check()
+    main()
